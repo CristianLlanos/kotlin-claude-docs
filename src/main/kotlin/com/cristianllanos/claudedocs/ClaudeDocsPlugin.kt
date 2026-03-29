@@ -8,12 +8,30 @@ import org.gradle.api.tasks.TaskAction
 import java.io.File
 import java.util.zip.ZipFile
 
+/**
+ * Configuration for the claude-docs plugin.
+ *
+ * ```kotlin
+ * claudeDocs {
+ *     outputDir = "docs/deps"
+ * }
+ * ```
+ */
 open class ClaudeDocsExtension {
+    /** Directory where extracted CLAUDE.md files are written, relative to the project root. */
     var outputDir: String = "docs/deps"
 }
 
+/**
+ * Task that scans `runtimeClasspath` JARs for embedded `CLAUDE.md` files
+ * and writes them to the configured output directory.
+ *
+ * Output files are named `{group}--{artifact}.md`. Stale files from
+ * previous runs are automatically removed.
+ */
 abstract class ExtractClaudeDocsTask : DefaultTask() {
 
+    /** Output directory path, relative to the project root. */
     @get:Input
     var outputPath: String = "docs/deps"
 
@@ -62,6 +80,11 @@ abstract class ExtractClaudeDocsTask : DefaultTask() {
     }
 }
 
+/**
+ * Gradle plugin that extracts `CLAUDE.md` files from dependency JARs.
+ *
+ * Registers the `claudeDocs` extension and the `extractClaudeDocs` task.
+ */
 class ClaudeDocsPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val extension = project.extensions.create("claudeDocs", ClaudeDocsExtension::class.java)
